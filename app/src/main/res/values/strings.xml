@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Foodist</string>
+    <string name="dialog_continue">continue</string>
+    <string name="dialog_cancel">@android:string/cancel</string>
+    <string name="default_permission_title">Please share those permissions</string>
+    <string name="default_permission_message">Extra please?</string>
+    <string name="location_permission_title">Please share your location</string>
+    <string name="location_permission_message">Foodist really needs your location in order to show you the best places
+        around!
+    </string>
 </resources>
