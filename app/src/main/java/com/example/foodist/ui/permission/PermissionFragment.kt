@@ -8,6 +8,7 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.example.foodist.R
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * The **PermissionsFragment** is a parent class that Fragments can inherit
@@ -17,6 +18,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
  *    - permission: PermissionRequest
  *    - onComplete: (success: Boolean) -> Void
  */
+@AndroidEntryPoint
 open class PermissionsFragment : Fragment() {
   private lateinit var onPermissionRequestComplete: (success: Boolean) -> Unit
   private val registerForActivity = registerForActivityResult(

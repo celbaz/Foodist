@@ -21,6 +21,10 @@ android {
         vectorDrawables.useSupportLibrary = true
     }
 
+    hilt {
+        enableAggregatingTask = true
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -31,6 +35,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
