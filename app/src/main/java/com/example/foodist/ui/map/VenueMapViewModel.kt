@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foodist.domain.models.Venues
 import com.example.foodist.domain.repositories.VenueRepository
+import com.example.foodist.services.LocationService
 import com.example.foodist.utils.MapMeasurements
 import com.example.foodist.utils.ResultWrapper
 import com.example.foodist.utils.Status
@@ -18,6 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class VenueMapViewModel @Inject constructor(
   var venueRepository: VenueRepository,
+  var locationService: LocationService,
 ) : ViewModel() {
   private val _venues = MutableLiveData<Venues>()
   private val _venueRequestStatus = MutableLiveData<Status>()
@@ -29,20 +31,8 @@ class VenueMapViewModel @Inject constructor(
   val currentCenterPoint = _currentCenterPoint
   val venueRequestStatus: LiveData<Status> = _venueRequestStatus
 
-  private fun getVenues(latLng: LatLng, radius: Double) = viewModelScope.launch {
-    _venueRequestStatus.value = Status.LOADING
-
-    venueRepository.fetchVenues(listOf(latLng.latitude, latLng.longitude), radius).let { venueResult ->
-      when (venueResult) {
-        is ResultWrapper.NetworkError -> _venueRequestStatus.value = Status.ERROR_NETWORK
-        is ResultWrapper.GenericError -> _venueRequestStatus.value = Status.ERROR
-        is ResultWrapper.Success -> _venues.value = venueResult.value
-      }
-    }
-  }
-
-  fun onMapReady(latLng: LatLng, radius: Double)  {
-    getVenues(latLng, radius)
+  fun onMapReady() {
+    getCurrentLocation()
   }
 
   fun onMapMovement(centerPoint: LatLng, currentZoom: Float) {
@@ -57,13 +47,37 @@ class VenueMapViewModel @Inject constructor(
       centerPoint.longitude != _currentCenterPoint.value?.longitude
     ) {
       _currentCenterPoint.value = centerPoint
+      setCurrentLocation(centerPoint)
       mapMoved = true
     }
 
     if (mapMoved) {
       val radius = MapMeasurements().getRadius(centerPoint, currentZoom.toDouble())
-      getVenues(centerPoint, radius)
     }
+  }
+
+  fun getVenues(latLng: LatLng, radius: Double) = viewModelScope.launch {
+    _venueRequestStatus.value = Status.LOADING
+
+    venueRepository.fetchVenues(listOf(latLng.latitude, latLng.longitude), radius).let { venueResult ->
+      when (venueResult) {
+        is ResultWrapper.NetworkError -> _venueRequestStatus.value = Status.ERROR_NETWORK
+        is ResultWrapper.GenericError -> _venueRequestStatus.value = Status.ERROR
+        is ResultWrapper.Success -> _venues.value = venueResult.value
+      }
+    }
+  }
+
+  private fun getCurrentLocation() {
+    viewModelScope.launch {
+      locationService.fetchLocation().let {
+        _currentCenterPoint.value = it
+      }
+    }
+  }
+
+  private fun setCurrentLocation(latLng: LatLng) {
+    locationService.setLocation(latLng)
   }
 
   companion object {

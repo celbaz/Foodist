@@ -34,7 +34,7 @@ class VenueMapFragment : PermissionsFragment() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    checkGrantedPermissions(PermissionRequest.LOCATION) { viewModel.onMapReady(LatLng(40.7484, -73.9857), 250.0) }
+    checkGrantedPermissions(PermissionRequest.LOCATION) { viewModel.onMapReady() }
   }
 
   override fun onCreateView(
@@ -79,13 +79,17 @@ class VenueMapFragment : PermissionsFragment() {
   }
 
   private fun initObservers() {
-    viewModel.venues.observe(viewLifecycleOwner, Observer { places ->
+    viewModel.venues.observe(viewLifecycleOwner) { places ->
       if (mapLoaded) {
         places.forEach { places ->
           setMapArea(LatLng(places.location.lat, places.location.lng), places.name)
         }
       }
-    })
+    }
+
+    viewModel.currentCenterPoint.observe(viewLifecycleOwner) { location ->
+      viewModel.getVenues(location, viewModel.zoom.value!!.toDouble())
+    }
   }
 
 }
