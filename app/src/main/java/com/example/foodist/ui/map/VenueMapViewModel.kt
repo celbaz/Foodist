@@ -60,7 +60,7 @@ class VenueMapViewModel @Inject constructor(
   private fun getVenues(latLng: LatLng, radius: Double) = viewModelScope.launch {
     _venueRequestStatus.value = Status.LOADING
 
-    venueRepository.fetchVenues(listOf(latLng.latitude, latLng.longitude), radius).let { venueResult ->
+    venueRepository.fetchVenues(latLng, radius).let { venueResult ->
       when (venueResult) {
         is ResultWrapper.NetworkError -> _venueRequestStatus.value = Status.ERROR_NETWORK
         is ResultWrapper.GenericError -> _venueRequestStatus.value = Status.ERROR
