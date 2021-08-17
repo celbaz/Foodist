@@ -8,4 +8,7 @@
     <string name="location_permission_message">Foodist really needs your location in order to show you the best places
         around!
     </string>
+    <string name="back_button">back button to map view</string>
+    <string name="venue_image">Image of a venue</string>
+    <string name="navigate_button">tapping this area will direct you to a navigation app</string>
 </resources>

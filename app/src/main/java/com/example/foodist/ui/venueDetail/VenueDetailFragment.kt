@@ -1,5 +1,7 @@
 package com.example.foodist.ui.venueDetail
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +9,7 @@ import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -37,7 +40,6 @@ class VenueDetailFragment : Fragment() {
   }
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
-    super.onActivityCreated(savedInstanceState)
     viewModel = ViewModelProvider(this).get(VenueDetailViewModel::class.java)
 
     setEventHandler()
@@ -46,7 +48,7 @@ class VenueDetailFragment : Fragment() {
   }
 
   private fun setEventHandler() {
-    detailView.setOnClickListener {
+    detailView.findViewById<ImageView>(R.id.detailNavBack).setOnClickListener {
       val action = VenueDetailFragmentDirections.actionVenueDetailFragmentToVenueMapFragment()
       detailView.findNavController().navigate(action)
     }
@@ -63,7 +65,7 @@ class VenueDetailFragment : Fragment() {
     }
 
     viewModel.requestStatus.observe(viewLifecycleOwner) { status ->
-      when(status) {
+      when (status) {
         Status.LOADING -> toggleLoadingIndicator()
         Status.SUCCESS -> toggleLoadingIndicator()
         Status.ERROR_NETWORK -> displayErrorIndicator()
@@ -76,11 +78,11 @@ class VenueDetailFragment : Fragment() {
   }
 
   private fun updateVenueDetails(venueDetails: VenueDetails) {
-    venueDetails?.rating.let {
+    venueDetails.rating.let {
       detailView.findViewById<TextView>(R.id.rating).text = venueDetails.rating.toString()
     }
 
-    venueDetails?.bestPhoto?.let {
+    venueDetails.bestPhoto?.let {
       val url = "${venueDetails.bestPhoto.prefix}300x500${venueDetails.bestPhoto.suffix}"
       val imageView = detailView.findViewById<ImageView>(R.id.venueImage)
       val transform = RoundedTransformationBuilder()
@@ -88,7 +90,7 @@ class VenueDetailFragment : Fragment() {
         .oval(false)
         .build()
 
-      Picasso.get().load(url).fit().transform(transform).into(imageView, object: com.squareup.picasso.Callback {
+      Picasso.get().load(url).fit().transform(transform).into(imageView, object : com.squareup.picasso.Callback {
         override fun onSuccess() {}
         override fun onError(e: java.lang.Exception?) {
           imageView.setImageResource(R.drawable.skeleton)
@@ -96,14 +98,31 @@ class VenueDetailFragment : Fragment() {
       })
     }
 
-    venueDetails?.location.let {}
+    val locationContainer = detailView.findViewById<LinearLayout>(R.id.locationContainer)
+    if (venueDetails.location == null) {
+      locationContainer.visibility = INVISIBLE
+    } else {
+      detailView.findViewById<TextView>(R.id.venueAddressLine1).text = venueDetails.location.address
+      detailView.findViewById<TextView>(R.id.venueAddressLine2).text =
+        "${venueDetails.location.city}, ${venueDetails.location.country}"
+      locationContainer.visibility = VISIBLE
+      locationContainer.setOnClickListener {
+        val gmmIntentUri = Uri.parse("geo:${venueDetails.location.lat},${venueDetails.location.lng}")
+        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+        startActivity(mapIntent)
+      }
+    }
+
+    venueDetails.location.let {
+
+    }
     venueDetails.stats?.tipCount?.let {}
 
   }
 
   private fun toggleLoadingIndicator() {
     val progressIndicator = detailView.findViewById<CircularProgressIndicator>(R.id.detailViewProgressIndicator)
-    progressIndicator.visibility = if(progressIndicator.visibility == INVISIBLE) VISIBLE else INVISIBLE
+    progressIndicator.visibility = if (progressIndicator.visibility == INVISIBLE) VISIBLE else INVISIBLE
   }
 
   private fun displayErrorIndicator() {

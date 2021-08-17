@@ -16,7 +16,6 @@ object ApplicationModule {
   @Provides
   fun provideMaxSize(): Int = ((Runtime.getRuntime().maxMemory() / 1024) / 8).toInt()
 
-
   @Provides
   @Singleton
   fun provideInMemoryCache(maxSize: Int): LruCache<String, Venue> {

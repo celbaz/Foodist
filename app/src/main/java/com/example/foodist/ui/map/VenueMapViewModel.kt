@@ -1,6 +1,5 @@
 package com.example.foodist.ui.map
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,6 +8,8 @@ import com.example.foodist.domain.models.Venue
 import com.example.foodist.domain.models.Venues
 import com.example.foodist.domain.repositories.VenueRepository
 import com.example.foodist.services.LocationService
+import com.example.foodist.services.PermissionsRequest
+import com.example.foodist.services.PermissionsService
 import com.example.foodist.utils.MapMeasurements
 import com.example.foodist.utils.ResultWrapper
 import com.example.foodist.utils.Status
@@ -29,43 +30,42 @@ class VenueMapViewModel @Inject constructor(
   private val _setMapArea = MutableLiveData<Boolean>()
   private val _zoom = MutableLiveData(DEFAULT_ZOOM_LEVEL)
 
-  val zoom: LiveData<Float> = _zoom
+  val zoomValue get() = _zoom.value ?: DEFAULT_ZOOM_LEVEL
   val venues: LiveData<Venues> = _venues
   val currentCenterPoint: LiveData<LatLng> = _currentCenterPoint
-  val setMapArea: LiveData<Boolean>  = _setMapArea
+  val setMapArea: LiveData<Boolean> = _setMapArea
   val venueRequestStatus: LiveData<Status> = _venueRequestStatus
 
-  fun onMapReady() {
-    getCurrentLocation()
+  fun onMapReady(permissionService: PermissionsService) {
+    permissionService.checkGrantedPermissions(PermissionsRequest.LOCATION) {
+      getCurrentLocation()
+    }
   }
 
   fun onMapMovement(centerPoint: LatLng, currentZoom: Float) {
-    if (_zoom.value != currentZoom) {
-      _zoom.value = currentZoom
-    }
-
     if (centerPoint.latitude != _currentCenterPoint.value?.latitude ||
-      centerPoint.longitude != _currentCenterPoint.value?.longitude
+      centerPoint.longitude != _currentCenterPoint.value?.longitude ||
+      _zoom.value != currentZoom
     ) {
+      _zoom.value = currentZoom
       _currentCenterPoint.value = centerPoint
+
       setCurrentLocation(centerPoint)
+      getVenues(centerPoint, zoomValue)
     }
   }
 
-  fun fetchResults() {
-      val radius = MapMeasurements().getRadius( _currentCenterPoint.value as LatLng, zoom.value!!.toDouble())
-      getVenues(_currentCenterPoint.value as LatLng,  radius)
-  }
 
-  private fun getVenues(latLng: LatLng, radius: Double) = viewModelScope.launch {
+  private fun getVenues(latLng: LatLng, radius: Float) = viewModelScope.launch {
     _venueRequestStatus.value = Status.LOADING
 
+    val radius = MapMeasurements().getRadius(latLng as LatLng, radius.toDouble())
     venueRepository.fetchVenues(latLng, radius).let { venueResult ->
       when (venueResult) {
         is ResultWrapper.NetworkError -> _venueRequestStatus.value = Status.ERROR_NETWORK
         is ResultWrapper.GenericError -> _venueRequestStatus.value = Status.ERROR
         is ResultWrapper.Success -> {
-          val oldList = if(_venues.value?.isNotEmpty() == true)  _venues.value else listOf<Venue>()
+          val oldList = if (_venues.value?.isNotEmpty() == true) _venues.value else listOf<Venue>()
           var finalResultSet = venueResult.value.toMutableList()
           if (oldList != null) {
             finalResultSet.addAll(oldList)

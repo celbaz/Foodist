@@ -7,8 +7,9 @@
         android:background="@drawable/venue_detail_view_background"
         android:orientation="vertical"
         tools:context=".ui.venueDetail.VenueDetailFragment">
-    <ImageView android:src="@drawable/ic_backward" android:layout_margin="24dp" android:layout_width="32dp"
-               android:layout_height="32dp" android:contentDescription="back button"/>
+    <ImageView android:id="@+id/detailNavBack" android:src="@drawable/ic_backward" android:layout_margin="24dp"
+               android:layout_width="32dp"
+               android:layout_height="32dp" android:contentDescription="@string/back_button"/>
 
     <TextView
             android:id="@+id/rating"
@@ -31,39 +32,74 @@
             android:textAlignment="center"
             android:textSize="48sp"
             android:text=""
-            android:lineHeight="48sp"
             android:textColor="@color/white"
             android:fontFamily="@font/staatliches"/>
 
 
     <LinearLayout
-            android:padding="32dp"
+            android:paddingTop="16dp"
             android:id="@+id/infoContainers"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical" android:paddingLeft="32dp" android:paddingRight="32dp">
 
-        <TextView android:id="@+id/error" android:visibility="gone" android:src="@color/skeleton" android:layout_width="match_parent" android:layout_height="160dp" android:paddingBottom="32dp"/>
+        <TextView android:id="@+id/error" android:visibility="gone" android:src="@color/skeleton"
+                  android:layout_width="match_parent" android:layout_height="160dp" android:paddingBottom="32dp"/>
+
         <ImageView
                 android:id="@+id/venueImage"
                 android:src="@drawable/skeleton"
                 android:background="@drawable/rounded_corner_borders"
                 android:layout_width="match_parent"
                 android:layout_height="160dp"
-                android:scaleType="centerCrop"
+                android:layout_marginBottom="24dp"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/venue_image"
         >
         </ImageView>
 
-        <ImageView android:background="@drawable/rounded_corner_borders" android:layout_width="match_parent"
-                   android:layout_height="160dp" android:paddingBottom="32dp"/>
+        <LinearLayout android:id="@+id/locationContainer" android:background="@drawable/rounded_corner_borders"
+                      android:weightSum="2"
+                      android:layout_width="match_parent"
+                      android:layout_height="120dp">
 
+            <LinearLayout android:orientation="vertical" android:layout_gravity="center"
+                          android:layout_weight="1"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_marginStart="32dp">
+
+                <TextView android:id="@+id/venueAddressLine1"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:textSize="16sp"
+                          android:textColor="@color/black"/>
+
+                <TextView android:id="@+id/venueAddressLine2"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:textSize="16sp"
+                          android:text=""/>
+
+            </LinearLayout>
+
+            <ImageView android:layout_weight="1"
+                       android:layout_gravity="center"
+                       android:layout_width="48dp"
+                       android:layout_height="48dp"
+                       android:src="@drawable/ic_near_me"
+                       android:contentDescription="@string/navigate_button"/>
+        </LinearLayout>
 
     </LinearLayout>
+
     <com.google.android.material.progressindicator.CircularProgressIndicator
             android:visibility="invisible"
             android:id="@+id/detailViewProgressIndicator"
             android:layout_gravity="center"
+            android:layout_margin="48dp"
             android:indeterminate="true"
             android:layout_height="48dp"
             android:layout_width="48dp"/>
+
 </LinearLayout>

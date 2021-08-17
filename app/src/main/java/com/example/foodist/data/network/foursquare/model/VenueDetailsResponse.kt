@@ -1,8 +1,8 @@
 package com.example.foodist.data.network.foursquare.model
 
 data class Contact(
-val phone: String?,
-val facebook: String?,
+  val phone: String?,
+  val facebook: String?,
 )
 
 data class Stats(
@@ -35,6 +35,6 @@ data class VenueDetailResult(
   val venue: VenueDetail,
 )
 
-data class VenueDetailsResponse (
+data class VenueDetailsResponse(
   val response: VenueDetailResult
 )

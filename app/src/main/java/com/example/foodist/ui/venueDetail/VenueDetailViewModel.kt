@@ -17,15 +17,15 @@ import javax.inject.Inject
 class VenueDetailViewModel @Inject constructor(var venueRepository: VenueRepository) : ViewModel() {
   private val _cachedInformation = MutableLiveData<Venue>()
   private val _requestStatus = MutableLiveData<Status>()
-  private val _venueDetails =  MutableLiveData<VenueDetails>();
+  private val _venueDetails = MutableLiveData<VenueDetails>()
 
-  var cachedInformation: LiveData<Venue> = _cachedInformation;
-  var venueDetails =  _venueDetails;
+  var cachedInformation: LiveData<Venue> = _cachedInformation
+  var venueDetails = _venueDetails
   val requestStatus: LiveData<Status> = _requestStatus
 
-  fun onViewReady(id:String) {
+  fun onViewReady(id: String) {
     val venue = venueRepository.getVenueFromCache(id)
-    if(venue is Venue) {
+    if (venue is Venue) {
       _cachedInformation.value = venue
     }
 

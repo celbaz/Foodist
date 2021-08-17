@@ -1,4 +1,4 @@
-package com.example.foodist.ui.permission
+package com.example.foodist.services
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -8,56 +8,56 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.example.foodist.R
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dagger.hilt.android.AndroidEntryPoint
 
 /**
- * The **PermissionsFragment** is a parent class that Fragments can inherit
- * in order to attempt to ascertain permissions required by a feature.
+ * The **PermissionsService** is called in order to attempt to ascertain permissions
+ * required by a feature.
  *
  * To use you must call the method **checkGrantedPermissions** with the following parameters:
  *    - permission: PermissionRequest
  *    - onComplete: (success: Boolean) -> Void
  */
-@AndroidEntryPoint
-open class PermissionsFragment : Fragment() {
-  private lateinit var onPermissionRequestComplete: (success: Boolean) -> Unit
-  private val registerForActivity = registerForActivityResult(
+
+typealias OnCompleteCallback = (success: Boolean) -> Unit
+
+class PermissionsService constructor(val fragment: Fragment) {
+  private var onPermissionRequestComplete: OnCompleteCallback? = null
+  private val registerForActivity = fragment.registerForActivityResult(
     ActivityResultContracts.RequestMultiplePermissions()
   ) { result ->
     val isGranted = result.values.all { granted -> granted == true }
-    onPermissionRequestComplete(isGranted)
+    onPermissionRequestComplete?.let { it(isGranted) }
+    onPermissionRequestComplete = null
   }
 
-  fun checkGrantedPermissions(permission: PermissionRequest, onComplete: (success: Boolean) -> Unit) {
-    onPermissionRequestComplete = onComplete
-
+  fun checkGrantedPermissions(permission: PermissionsRequest, onComplete: (success: Boolean) -> Unit) {
     if (arePermissionsGranted(permission)) {
-      onPermissionRequestComplete(true)
+      onComplete(true)
     } else {
+      onPermissionRequestComplete = onComplete
       requestPermissionsReady(permission)
     }
   }
 
-
-  private fun arePermissionsGranted(permission: PermissionRequest): Boolean {
+  private fun arePermissionsGranted(permission: PermissionsRequest): Boolean {
     val areAllPermissionsGranted = permission.getPermissionsArray().all {
       ActivityCompat.checkSelfPermission(
-        requireContext(), it
+        fragment.requireContext(), it
       ) == PackageManager.PERMISSION_GRANTED
     }
 
     return areAllPermissionsGranted
   }
 
-  private fun shouldShowPermissionRationaleDialog(permission: PermissionRequest): Boolean {
+  private fun shouldShowPermissionRationaleDialog(permission: PermissionsRequest): Boolean {
     return permission.getPermissionsArray().any { permissionName ->
-      shouldShowRequestPermissionRationale(permissionName)
+      fragment.shouldShowRequestPermissionRationale(permissionName)
     }
   }
 
-  private fun showPermissionRationaleDialog(permission: PermissionRequest) {
+  private fun showPermissionRationaleDialog(permission: PermissionsRequest) {
     val copy = getCopy(permission)
-    MaterialAlertDialogBuilder(requireActivity(), R.style.AppTheme_AlertDialog)
+    MaterialAlertDialogBuilder(fragment.requireContext(), R.style.AppTheme_AlertDialog)
       .setTitle(copy.title)
       .setMessage(copy.message)
       .setCancelable(false)
@@ -68,7 +68,7 @@ open class PermissionsFragment : Fragment() {
   }
 
 
-  private fun requestPermissionsReady(permission: PermissionRequest) {
+  private fun requestPermissionsReady(permission: PermissionsRequest) {
     if (shouldShowPermissionRationaleDialog(permission)) {
       showPermissionRationaleDialog(permission)
     } else {
@@ -77,21 +77,18 @@ open class PermissionsFragment : Fragment() {
 
   }
 
-  private fun requestPermission(permission: PermissionRequest) {
+  private fun requestPermission(permission: PermissionsRequest) {
     val permissionsArray = permission.getPermissionsArray()
-
     registerForActivity.launch(permissionsArray)
-
   }
 
-  private fun getCopy(permission: PermissionRequest): PermissionCopy {
+  private fun getCopy(permission: PermissionsRequest): PermissionsCopy {
     return when (permission) {
-      PermissionRequest.LOCATION -> PermissionCopy(
+      PermissionsRequest.LOCATION -> PermissionsCopy(
         R.string.location_permission_title,
         R.string.location_permission_message,
       )
     }
-
   }
 
   companion object {
@@ -100,14 +97,14 @@ open class PermissionsFragment : Fragment() {
 }
 
 
-data class PermissionCopy(
+data class PermissionsCopy(
   @StringRes val title: Int,
   @StringRes val message: Int,
   @StringRes val action: Int = R.string.dialog_continue,
   @StringRes val cancel: Int = R.string.dialog_cancel,
 )
 
-enum class PermissionRequest {
+enum class PermissionsRequest {
   LOCATION;
 
   fun getPermissionsArray(): Array<String> {

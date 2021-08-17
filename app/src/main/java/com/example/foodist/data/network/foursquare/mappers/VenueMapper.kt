@@ -1,9 +1,8 @@
 package com.example.foodist.data.network.foursquare.mappers
 
-import com.example.foodist.data.network.foursquare.model.*
+import com.example.foodist.data.network.foursquare.model.VenueDetailsResponse
+import com.example.foodist.data.network.foursquare.model.VenueSearchResponse
 import com.example.foodist.domain.models.*
-import com.example.foodist.domain.models.Contact
-import com.example.foodist.domain.models.Stats
 import retrofit2.Response
 
 class VenueMapper {
@@ -25,39 +24,40 @@ class VenueMapper {
       )
     } ?: listOf()
   }
-//mapVenueDetailsResponseToDomain
+
+  //mapVenueDetailsResponseToDomain
   fun mapVenueDetailsResponseToDomain(payload: Response<VenueDetailsResponse>): VenueDetails {
     val resp = payload.body()?.response?.venue
     return VenueDetails(
       resp!!.name,
       Contact(
-        resp?.contact?.phone,
-        resp?.contact?.facebook,
+        resp.contact?.phone,
+        resp.contact?.facebook,
       ),
       Location(
-        resp?.location?.address,
-        resp?.location?.lat  ?: 0.0,
-        resp?.location?.lng ?: 0.0,
-        resp?.location?.postalCode,
-        resp?.location?.city,
-        resp?.location?.state,
-        resp?.location?.country,
-        resp?.location?.formattedAddress
+        resp.location.address,
+        resp.location.lat,
+        resp.location.lng,
+        resp.location.postalCode,
+        resp.location.city,
+        resp.location.state,
+        resp.location.country,
+        resp.location.formattedAddress
       ),
-      resp?.canonicalUrl,
-      resp?.rating,
+      resp.canonicalUrl,
+      resp.rating,
       Stats(
-        resp?.stats?.tipCount,
-        resp?.stats?.usersCount,
-        resp?.stats?.tipCount,
-        resp?.stats?.visitsCount,
+        resp.stats?.tipCount,
+        resp.stats?.usersCount,
+        resp.stats?.tipCount,
+        resp.stats?.visitsCount,
       ),
-      if (resp?.bestPhoto != null) Photo(
-        resp.bestPhoto?.id,
-        resp.bestPhoto?.prefix,
-        resp.bestPhoto?.suffix,
-        resp.bestPhoto?.width,
-        resp.bestPhoto?.height,
+      if (resp.bestPhoto != null) Photo(
+        resp.bestPhoto.id,
+        resp.bestPhoto.prefix,
+        resp.bestPhoto.suffix,
+        resp.bestPhoto.width,
+        resp.bestPhoto.height,
       ) else null
     )
   }

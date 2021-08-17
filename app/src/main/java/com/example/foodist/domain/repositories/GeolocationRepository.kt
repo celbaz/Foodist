@@ -4,7 +4,6 @@ import android.content.Context
 import android.telephony.TelephonyManager
 import com.example.foodist.data.network.geolocation.GoogleMapsApiService
 import com.example.foodist.data.network.geolocation.model.GeolocationRequest
-import com.example.foodist.data.network.geolocation.model.GeolocationResponse
 import com.example.foodist.utils.ResultWrapper
 import com.example.foodist.utils.handleThrowable
 import com.google.android.gms.maps.model.LatLng

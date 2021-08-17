@@ -1,6 +1,5 @@
 package com.example.foodist.domain.repositories
 
-import android.util.Log
 import android.util.LruCache
 import com.example.foodist.data.network.foursquare.FoursquareApiService
 import com.example.foodist.data.network.foursquare.mappers.VenueMapper
@@ -23,10 +22,10 @@ class VenueRepository @Inject constructor(
 
     return try {
       val results = apiService.fetchVenues(
-          "${coordinates.latitude},${coordinates.longitude}",
-          radius,
-          listOf(Constants.FOURSQUARE_FOOD_CATEGORY_ID)
-        )
+        "${coordinates.latitude},${coordinates.longitude}",
+        radius,
+        listOf(Constants.FOURSQUARE_FOOD_CATEGORY_ID)
+      )
 
       val resultsMapped = VenueMapper().mapVenueResponseToDomain(results)
       resultsMapped.forEach { venue ->
@@ -41,22 +40,20 @@ class VenueRepository @Inject constructor(
 
   private fun fetchVenuesFromCache(coordinates: LatLng, radius: Double): Venues {
     var dimensions = MapMeasurements().getLatLngDimensionsFromRadius(coordinates, radius)
-    var cachedResults = cache.snapshot().values.filter {  venue ->
+    var cachedResults = cache.snapshot().values.filter { venue ->
       (venue.location.lat >= dimensions.startPointLat && venue.location.lat <= dimensions.endPointLat) &&
-      (venue.location.lng >= dimensions.startPointLng && venue.location.lng <= dimensions.endPointLng)
+          (venue.location.lng >= dimensions.startPointLng && venue.location.lng <= dimensions.endPointLng)
     }
 
     return cachedResults.toList()
   }
 
   suspend fun getVenueDetails(id: String): ResultWrapper<VenueDetails> {
-    val result = apiService.fetchVenueDetails(id)
-    val resultMapped = VenueMapper().mapVenueDetailsResponseToDomain(result)
-    Log.d("RESP D", result.body().toString())
-    Log.d("RESP E", resultMapped.toString())
     return try {
+      val result = apiService.fetchVenueDetails(id)
+      val resultMapped = VenueMapper().mapVenueDetailsResponseToDomain(result)
       ResultWrapper.Success(resultMapped)
-    }  catch (throwable: Throwable) {
+    } catch (throwable: Throwable) {
       handleThrowable(throwable)
     }
   }

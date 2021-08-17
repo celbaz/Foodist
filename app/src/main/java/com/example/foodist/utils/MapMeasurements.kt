@@ -1,7 +1,6 @@
 package com.example.foodist.utils
 
 import android.content.res.Resources
-import android.location.GnssAntennaInfo
 import com.google.android.gms.maps.model.LatLng
 import kotlin.math.cos
 import kotlin.math.pow
@@ -16,8 +15,8 @@ data class LatLngDimensions(
 class MapMeasurements {
 
   fun getRadius(latLng: LatLng, zoom: Double): Double {
-    var width = getScreenWidth().toDouble()
-    var perPixelSize = metersPerPx(latLng, zoom)
+    val width = getScreenWidth().toDouble()
+    val perPixelSize = metersPerPx(latLng, zoom)
     return (width / 2) * perPixelSize
   }
 
@@ -32,7 +31,7 @@ class MapMeasurements {
   }
 
   private fun getUpdatedLongitude(lat: Double, lng: Double, degreeOffset: Double): Double {
-    return lng + (degreeOffset) / cos(lat * (Math.PI / 180));
+    return lng + (degreeOffset) / cos(lat * (Math.PI / 180))
   }
 
 
@@ -49,8 +48,8 @@ class MapMeasurements {
   }
 
   companion object {
-    val GOOGLE_MAPS_ZOOM_CONSTANT = 156543.03392
-    val METER_IN_DEGREES = (1 / ((2 * Math.PI / 360) * 6378.137)) / 1000
+    const val GOOGLE_MAPS_ZOOM_CONSTANT = 156543.03392
+    const val METER_IN_DEGREES = (1 / ((2 * Math.PI / 360) * 6378.137)) / 1000
 
   }
 }

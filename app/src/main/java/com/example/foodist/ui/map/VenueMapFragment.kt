@@ -1,24 +1,19 @@
 package com.example.foodist.ui.map
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.RatingBar
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import com.example.foodist.R
-import com.example.foodist.databinding.FragmentVenueMapBinding
 import com.example.foodist.domain.models.Venue
-import com.example.foodist.ui.permission.PermissionRequest
-import com.example.foodist.ui.permission.PermissionsFragment
+import com.example.foodist.services.PermissionsService
 import com.example.foodist.utils.Status
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -39,7 +34,7 @@ import dagger.hilt.android.AndroidEntryPoint
  *  - The map will populate with results as the user panes.
  */
 @AndroidEntryPoint
-class VenueMapFragment : PermissionsFragment() {
+class VenueMapFragment : Fragment() {
   private var mapLoaded: Boolean = false
   private var cameraMovedByUser: Boolean = false
   private lateinit var googleMap: GoogleMap
@@ -51,9 +46,7 @@ class VenueMapFragment : PermissionsFragment() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    checkGrantedPermissions(PermissionRequest.LOCATION) {
-      viewModel.onMapReady()
-    }
+    viewModel.onMapReady(PermissionsService(this))
   }
 
   override fun onCreateView(
@@ -80,7 +73,7 @@ class VenueMapFragment : PermissionsFragment() {
   }
 
   private fun setMapPin(currentPosition: LatLng, id: String) {
-    if(markerList.any {marker -> marker.tag == id }) return
+    if (markerList.any { marker -> marker.tag == id }) return
 
     var marker = googleMap.addMarker(
       MarkerOptions()
@@ -93,27 +86,24 @@ class VenueMapFragment : PermissionsFragment() {
   }
 
   private fun setMapArea(currentPosition: LatLng) {
-    val zoomLevel = viewModel.zoom.value!!
-    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, zoomLevel))
+    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, viewModel.zoomValue))
   }
 
   private fun setCardView(id: String): Boolean {
     var venue: Venue = viewModel.venues.value?.find { place -> place.id == id } ?: return true
 
-
-    // Set and Clear onClickListeners
     venueCardView.setOnClickListener {
       val action = VenueMapFragmentDirections.actionVenueMapFragmentToVenueDetailFragment(id)
       venueCardView.findNavController().navigate(action)
     }
 
-    val address: String? = venue.location?.formattedAddress?.first() ?: venue.location.address
+    val address: String? = venue.location.formattedAddress?.first() ?: venue.location.address
     venueCardView.findViewById<TextView>(R.id.businessTitle).text = venue.name
-    if(address != null) {
+    if (address != null) {
       venueCardView.findViewById<TextView>(R.id.shortAddress).text = address
     }
 
-    if(venueCardView.visibility == INVISIBLE) {
+    if (venueCardView.visibility == INVISIBLE) {
       venueCardView.visibility = VISIBLE
     }
 
@@ -133,13 +123,13 @@ class VenueMapFragment : PermissionsFragment() {
       }
     }
 
-    googleMap.setOnMarkerClickListener { marker -> setCardView(marker.tag as String)}
+    googleMap.setOnMarkerClickListener { marker -> setCardView(marker.tag as String) }
     googleMap.setOnMapClickListener { venueCardView.visibility = INVISIBLE }
   }
 
   private fun initObservers() {
     viewModel.venueRequestStatus.observe(viewLifecycleOwner) { status ->
-      progressIndicator.visibility = if(status == Status.LOADING) VISIBLE else INVISIBLE
+      progressIndicator.visibility = if (status == Status.LOADING) VISIBLE else INVISIBLE
     }
 
     viewModel.venues.observe(viewLifecycleOwner) { places ->
@@ -151,10 +141,8 @@ class VenueMapFragment : PermissionsFragment() {
     }
 
     viewModel.setMapArea.observe(viewLifecycleOwner) { shouldSet ->
-      if(shouldSet) setMapArea(viewModel.currentCenterPoint.value!!)
+      if (shouldSet) setMapArea(viewModel.currentCenterPoint.value!!)
     }
-
-    viewModel.currentCenterPoint.observe(viewLifecycleOwner) { viewModel.fetchResults()}
   }
 
 }
