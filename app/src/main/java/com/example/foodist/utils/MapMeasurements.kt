@@ -11,11 +11,11 @@ class MapMeasurements {
   fun getRadius(latLng: LatLng, zoom: Double): Double {
     var width = getScreenWidth().toDouble()
     var perPixelSize = metersPerPx(latLng, zoom)
-    return width * perPixelSize
+    return (width / 2) * perPixelSize
   }
 
   fun metersPerPx(latLng: LatLng, zoom: Double): Double {
-    return GOOGLE_MAPS_ZOOM_CONSTANT * cos(latLng.latitude * Math.PI / 180) / (2.0).pow(zoom)
+    return GOOGLE_MAPS_ZOOM_CONSTANT * cos(latLng.latitude * Math.PI / 180) / (2.0).pow(zoom + 1.0)
   }
 
   private fun getScreenWidth(): Int {

@@ -26,3 +26,6 @@ places to eat nearby.
 * Given the complexity of this application, I have chosen to call `ApiServices` directly. If this were a production
   application, I would add a layer of abstraction to leave the project with flexibility to switch the underlying request
   library.
+* In a production application I would call the search api via a backend service. Currently, due to the project requirements I
+  have hardcoded the foursquare restaurant category id but, this will make things painful in the long term if in the future we
+  wanted to allow users to filter by category. 

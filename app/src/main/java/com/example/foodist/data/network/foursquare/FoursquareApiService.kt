@@ -11,5 +11,6 @@ interface FoursquareApiService {
   suspend fun fetchVenues(
     @Query("ll") coordinates: String,
     @Query("radius") radius: Double,
+    @Query("categoryId") categories: List<String>
   ): Response<VenueSearchResponse>
 }

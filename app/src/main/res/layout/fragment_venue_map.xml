@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
+             android:orientation="vertical"
              tools:context=".ui.map.VenueMapFragment">
 
     <androidx.fragment.app.FragmentContainerView android:id="@+id/mapFragment"
               android:name="com.google.android.gms.maps.SupportMapFragment"
               android:layout_width="match_parent"
               android:layout_height="match_parent" />
-</FrameLayout>
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/mapProgressIndicator"
+            android:layout_width="match_parent"
+            android:indeterminate="true"
+            android:layout_height="wrap_content"/>
+    <include layout="@layout/venue_card_view"
+
+             android:layout_width="match_parent"
+             android:layout_alignParentBottom="true"
+             android:layout_height="wrap_content"/>
+</RelativeLayout>

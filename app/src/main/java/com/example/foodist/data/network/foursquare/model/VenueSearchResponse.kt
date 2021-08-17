@@ -24,6 +24,7 @@ data class VenueResponse(
   val id: String,
   val name: String,
   val location: LocationResponse,
+  val categories: List<CategoryResponse>?,
 )
 
 data class CategoryResponse(
@@ -37,7 +38,6 @@ data class CategoryResponse(
 
 data class VenueSearchResults(
   val venues: List<VenueResponse>,
-  val categories: List<CategoryResponse>?,
 )
 
 data class VenueSearchResponse(

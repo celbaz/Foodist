@@ -1,19 +1,31 @@
 package com.example.foodist.ui.map
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.RatingBar
+import android.widget.RelativeLayout
+import android.widget.TextView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.example.foodist.R
+import com.example.foodist.domain.models.Venue
 import com.example.foodist.ui.permission.PermissionRequest
 import com.example.foodist.ui.permission.PermissionsFragment
+import com.example.foodist.utils.Status
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -29,12 +41,17 @@ class VenueMapFragment : PermissionsFragment() {
   private var mapLoaded: Boolean = false
   private var cameraMovedByUser: Boolean = false
   private lateinit var googleMap: GoogleMap
+  private lateinit var progressIndicator: LinearProgressIndicator
+  private lateinit var venueCardView: RelativeLayout
   private val viewModel: VenueMapViewModel by viewModels()
+  private val markerList: MutableList<Marker> = mutableListOf()
 
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    checkGrantedPermissions(PermissionRequest.LOCATION) { viewModel.onMapReady() }
+    checkGrantedPermissions(PermissionRequest.LOCATION) {
+      viewModel.onMapReady()
+    }
   }
 
   override fun onCreateView(
@@ -48,6 +65,8 @@ class VenueMapFragment : PermissionsFragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     val mapFragment = childFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment?
+    progressIndicator = view.findViewById(R.id.mapProgressIndicator)
+    venueCardView = view.findViewById(R.id.venueCardView)
 
     mapFragment?.getMapAsync { gMap ->
       googleMap = gMap
@@ -58,10 +77,39 @@ class VenueMapFragment : PermissionsFragment() {
     }
   }
 
-  private fun setMapArea(currentPosition: LatLng, title: String) {
-    val zoomLevel = viewModel.zoom.value ?: 15.0f
-    googleMap.addMarker(MarkerOptions().position(currentPosition).title(title))
+  private fun setMapPin(currentPosition: LatLng, id: String) {
+    if(markerList.any {marker -> marker.tag == id }) return
+
+    var marker = googleMap.addMarker(
+      MarkerOptions()
+        .position(currentPosition)
+        .icon(BitmapDescriptorFactory.fromResource(R.drawable.map_pin))
+    )
+
+    marker.tag = id
+    markerList.add(marker)
+  }
+
+  private fun setMapArea(currentPosition: LatLng) {
+    val zoomLevel = viewModel.zoom.value!!
     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, zoomLevel))
+  }
+
+  private fun setCardView(id: String): Boolean {
+    var venue: Venue = viewModel.venues.value?.find { place -> place.id == id } ?: return true
+
+
+    val address: String? = venue.location?.formattedAddress?.first() ?: venue.location.address
+    venueCardView.findViewById<TextView>(R.id.businessTitle).text = venue.name
+    if(address != null) {
+      venueCardView.findViewById<TextView>(R.id.shortAddress).text = address
+    }
+
+    if(venueCardView.visibility == INVISIBLE) {
+      venueCardView.visibility = VISIBLE
+    }
+
+    return true
   }
 
   private fun initMapEventHandlers() {
@@ -76,20 +124,29 @@ class VenueMapFragment : PermissionsFragment() {
         cameraMovedByUser = false
       }
     }
+
+    googleMap.setOnMarkerClickListener { marker -> setCardView(marker.tag as String)}
+    googleMap.setOnMapClickListener { venueCardView.visibility = INVISIBLE }
   }
 
   private fun initObservers() {
+    viewModel.venueRequestStatus.observe(viewLifecycleOwner) { status ->
+      progressIndicator.visibility = if(status == Status.LOADING) VISIBLE else INVISIBLE
+    }
+
     viewModel.venues.observe(viewLifecycleOwner) { places ->
-      if (mapLoaded) {
+      if (mapLoaded && places.isNotEmpty()) {
         places.forEach { places ->
-          setMapArea(LatLng(places.location.lat, places.location.lng), places.name)
+          setMapPin(LatLng(places.location.lat, places.location.lng), places.id)
         }
       }
     }
 
-    viewModel.currentCenterPoint.observe(viewLifecycleOwner) { location ->
-      viewModel.getVenues(location, viewModel.zoom.value!!.toDouble())
+    viewModel.setMapArea.observe(viewLifecycleOwner) { shouldSet ->
+      if(shouldSet) setMapArea(viewModel.currentCenterPoint.value!!)
     }
+
+    viewModel.currentCenterPoint.observe(viewLifecycleOwner) { viewModel.fetchResults()}
   }
 
 }

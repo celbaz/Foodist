@@ -18,4 +18,8 @@
         <item name="android:textColor">@color/gold_500</item>
         <item name="rippleColor">@color/gold_500</item>
     </style>
+    <style name="AppTheme.RatingBar" parent="android:style/Widget.Material.RatingBar.Small">
+        <item name="colorControlNormal">@color/white</item>
+        <item name="colorControlActivated">@color/gold_500</item>
+    </style>
 </resources>

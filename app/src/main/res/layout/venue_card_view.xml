@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        android:id="@+id/venueCardView"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:layout_margin="32dp" android:background="@android:color/transparent"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+            android:id="@+id/cardBody"
+            android:orientation="vertical"
+            android:background="@drawable/rounded_corners"
+            android:layout_width="match_parent"
+            android:layout_height="140dp" android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp" android:layout_marginEnd="16dp" android:layout_marginBottom="16dp"
+            android:paddingStart="24dp" android:paddingEnd="24dp" android:paddingTop="24dp">
+        <TextView
+                android:id="@+id/businessTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:lineHeight="24sp"
+                android:textColor="@color/black"
+        />
+        <TextView android:id="@+id/shortAddress" android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:scrollHorizontally="true"
+                  android:ellipsize="end"
+                  android:maxLines="1"
+                  android:textColor="@color/black"
+                  android:layout_centerHorizontal="true"
+                  android:paddingBottom="4dp"
+                  android:textSize="16sp"/>
+
+        <com.google.android.material.button.MaterialButton
+                android:layout_gravity="end"
+                android:padding="4dp"
+                android:layout_margin="4dp"
+                app:icon="@drawable/ic_forward"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+        />
+    </LinearLayout>
+
+
+</RelativeLayout>
