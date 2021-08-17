@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/venue_detail_view_background"
+        android:orientation="vertical"
+        tools:context=".ui.venueDetail.VenueDetailFragment">
+    <ImageView android:src="@drawable/ic_backward" android:layout_margin="24dp" android:layout_width="32dp"
+               android:layout_height="32dp" android:contentDescription="back button"/>
+
+    <TextView
+            android:id="@+id/rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:layout_gravity="center"
+            android:textSize="36sp"
+            android:padding="18dp"
+            android:layout_margin="24dp"
+            android:minWidth="86dp"
+            android:textColor="@color/white"
+            android:background="@drawable/rounded_corners_secondary"
+            android:fontFamily="@font/staatliches"/>
+
+    <TextView
+            android:id="@+id/businessDetailTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textSize="48sp"
+            android:text=""
+            android:lineHeight="48sp"
+            android:textColor="@color/white"
+            android:fontFamily="@font/staatliches"/>
+
+
+    <LinearLayout
+            android:padding="32dp"
+            android:id="@+id/infoContainers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        <TextView android:id="@+id/error" android:visibility="gone" android:src="@color/skeleton" android:layout_width="match_parent" android:layout_height="160dp" android:paddingBottom="32dp"/>
+        <ImageView
+                android:id="@+id/venueImage"
+                android:src="@drawable/skeleton"
+                android:background="@drawable/rounded_corner_borders"
+                android:layout_width="match_parent"
+                android:layout_height="160dp"
+                android:scaleType="centerCrop"
+        >
+        </ImageView>
+
+        <ImageView android:background="@drawable/rounded_corner_borders" android:layout_width="match_parent"
+                   android:layout_height="160dp" android:paddingBottom="32dp"/>
+
+
+    </LinearLayout>
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:visibility="invisible"
+            android:id="@+id/detailViewProgressIndicator"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            android:layout_height="48dp"
+            android:layout_width="48dp"/>
+</LinearLayout>

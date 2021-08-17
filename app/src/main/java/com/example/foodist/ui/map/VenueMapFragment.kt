@@ -13,7 +13,9 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.findNavController
 import com.example.foodist.R
+import com.example.foodist.databinding.FragmentVenueMapBinding
 import com.example.foodist.domain.models.Venue
 import com.example.foodist.ui.permission.PermissionRequest
 import com.example.foodist.ui.permission.PermissionsFragment
@@ -98,6 +100,12 @@ class VenueMapFragment : PermissionsFragment() {
   private fun setCardView(id: String): Boolean {
     var venue: Venue = viewModel.venues.value?.find { place -> place.id == id } ?: return true
 
+
+    // Set and Clear onClickListeners
+    venueCardView.setOnClickListener {
+      val action = VenueMapFragmentDirections.actionVenueMapFragmentToVenueDetailFragment(id)
+      venueCardView.findNavController().navigate(action)
+    }
 
     val address: String? = venue.location?.formattedAddress?.first() ?: venue.location.address
     venueCardView.findViewById<TextView>(R.id.businessTitle).text = venue.name

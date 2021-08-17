@@ -29,11 +29,11 @@ data class VenueResponse(
 
 data class CategoryResponse(
   val id: String,
-  val name: String,
-  val pluralName: String,
-  val shortName: String,
-  val icon: Icon,
-  val primary: Boolean,
+  val name: String?,
+  val pluralName: String?,
+  val shortName: String?,
+  val icon: Icon?,
+  val primary: Boolean?,
 )
 
 data class VenueSearchResults(

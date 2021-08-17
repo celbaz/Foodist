@@ -5,5 +5,17 @@
             app:startDestination="@id/venueMapFragment">
 
     <fragment android:id="@+id/venueMapFragment" android:name="com.example.foodist.ui.map.VenueMapFragment"
-              android:label="fragment_venue_map" tools:layout="@layout/fragment_venue_map"/>
+              android:label="fragment_venue_map" tools:layout="@layout/fragment_venue_map">
+        <action android:id="@+id/action_venueMapFragment_to_venueDetailFragment"
+                app:destination="@id/venueDetailFragment"/>
+    </fragment>
+    <fragment android:id="@+id/venueDetailFragment"
+              android:name="com.example.foodist.ui.venueDetail.VenueDetailFragment"
+              android:label="venue_detail_fragment" tools:layout="@layout/venue_detail_fragment">
+        <argument
+                android:name="venueId"
+                app:argType="string"/>
+        <action android:id="@+id/action_venueDetailFragment_to_venueMapFragment"
+                app:destination="@id/venueMapFragment"/>
+    </fragment>
 </navigation>
