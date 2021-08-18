@@ -20,7 +20,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 typealias OnCompleteCallback = (success: Boolean) -> Unit
 
-class PermissionsService constructor(val fragment: Fragment) {
+class PermissionsService constructor(private val fragment: Fragment) {
   private var onPermissionRequestComplete: OnCompleteCallback? = null
   private val registerForActivity = fragment.registerForActivityResult(
     ActivityResultContracts.RequestMultiplePermissions()
@@ -67,7 +67,6 @@ class PermissionsService constructor(val fragment: Fragment) {
       .show()
   }
 
-
   private fun requestPermissionsReady(permission: PermissionsRequest) {
     if (shouldShowPermissionRationaleDialog(permission)) {
       showPermissionRationaleDialog(permission)
@@ -89,10 +88,6 @@ class PermissionsService constructor(val fragment: Fragment) {
         R.string.location_permission_message,
       )
     }
-  }
-
-  companion object {
-    const val REQUEST_CODE = 1
   }
 }
 

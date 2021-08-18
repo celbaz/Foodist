@@ -60,23 +60,29 @@ class VenueMapViewModel @Inject constructor(
     _venueRequestStatus.value = Status.LOADING
 
     val radius = MapMeasurements().getRadius(latLng, zoom.toDouble())
+    val cachedVenues = venueRepository.fetchVenuesFromCache(latLng, radius)
+    _venues.value = mergeResultSets(_venues, cachedVenues)
+
     venueRepository.fetchVenues(latLng, radius).let { venueResult ->
       when (venueResult) {
         is ResultWrapper.NetworkError -> _venueRequestStatus.value = Status.ERROR_NETWORK
         is ResultWrapper.GenericError -> _venueRequestStatus.value = Status.ERROR
         is ResultWrapper.Success -> {
-          val oldList = if (_venues.value?.isNotEmpty() == true) _venues.value else listOf<Venue>()
-          val finalResultSet = venueResult.value.toMutableList()
-          if (oldList != null) {
-            finalResultSet.addAll(oldList)
-            finalResultSet.distinctBy { it.id }
-          }
-
-          _venues.value = finalResultSet
+          _venues.value = mergeResultSets(_venues, venueResult.value)
           _venueRequestStatus.value = Status.SUCCESS
         }
       }
     }
+  }
+
+  private fun mergeResultSets(oldList: LiveData<Venues>, newList: Venues ): Venues {
+    val previousList = if (oldList.value?.isNotEmpty() == true) oldList.value else listOf<Venue>()
+    val finalResultSet = newList.toMutableList()
+    if (previousList != null) {
+      finalResultSet.addAll(previousList)
+      finalResultSet.distinctBy { it.id }
+    }
+    return finalResultSet
   }
 
   private fun getCurrentLocation() {

@@ -38,9 +38,9 @@ class VenueRepository @Inject constructor(
     }
   }
 
-  private fun fetchVenuesFromCache(coordinates: LatLng, radius: Double): Venues {
-    var dimensions = MapMeasurements().getLatLngDimensionsFromRadius(coordinates, radius)
-    var cachedResults = cache.snapshot().values.filter { venue ->
+  fun fetchVenuesFromCache(coordinates: LatLng, radius: Double): Venues {
+    val dimensions = MapMeasurements().getLatLngDimensionsFromRadius(coordinates, radius)
+    val cachedResults = cache.snapshot().values.filter { venue ->
       (venue.location.lat >= dimensions.startPointLat && venue.location.lat <= dimensions.endPointLat) &&
           (venue.location.lng >= dimensions.startPointLng && venue.location.lng <= dimensions.endPointLng)
     }

@@ -6,6 +6,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Named
 import javax.inject.Singleton
 
 
@@ -14,11 +15,12 @@ import javax.inject.Singleton
 object ApplicationModule {
 
   @Provides
+  @Named("MaxCacheSize")
   fun provideMaxSize(): Int = ((Runtime.getRuntime().maxMemory() / 1024) / 8).toInt()
 
   @Provides
   @Singleton
-  fun provideInMemoryCache(maxSize: Int): LruCache<String, Venue> {
+  fun provideInMemoryCache(@Named("MaxCacheSize") maxSize: Int): LruCache<String, Venue> {
     return LruCache<String, Venue>(maxSize)
   }
 }
