@@ -41,8 +41,7 @@ class VenueMapFragment : Fragment() {
   private lateinit var progressIndicator: LinearProgressIndicator
   private lateinit var venueCardView: RelativeLayout
   private val viewModel: VenueMapViewModel by viewModels()
-  private val markerList: MutableList<Marker> = mutableListOf()
-
+  private val markerMap: MutableMap<String, Marker> = mutableMapOf()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -73,7 +72,7 @@ class VenueMapFragment : Fragment() {
   }
 
   private fun setMapPin(currentPosition: LatLng, id: String) {
-    if (markerList.any { marker -> marker.tag == id }) return
+    if (markerMap[id] != null) return
 
     var marker = googleMap.addMarker(
       MarkerOptions()
@@ -82,7 +81,7 @@ class VenueMapFragment : Fragment() {
     )
 
     marker.tag = id
-    markerList.add(marker)
+    markerMap[id] = marker
   }
 
   private fun setMapArea(currentPosition: LatLng) {
@@ -132,10 +131,10 @@ class VenueMapFragment : Fragment() {
       progressIndicator.visibility = if (status == Status.LOADING) VISIBLE else INVISIBLE
     }
 
-    viewModel.venues.observe(viewLifecycleOwner) { places ->
-      if (mapLoaded && places.isNotEmpty()) {
-        places.forEach { places ->
-          setMapPin(LatLng(places.location.lat, places.location.lng), places.id)
+    viewModel.venues.observe(viewLifecycleOwner) { locations ->
+      if (mapLoaded && locations.isNotEmpty()) {
+        locations.forEach { location ->
+          setMapPin(LatLng(location.location.lat, location.location.lng), location.id)
         }
       }
     }
@@ -144,5 +143,4 @@ class VenueMapFragment : Fragment() {
       if (shouldSet) setMapArea(viewModel.currentCenterPoint.value!!)
     }
   }
-
 }

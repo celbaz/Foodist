@@ -11,4 +11,10 @@
     <string name="back_button">back button to map view</string>
     <string name="venue_image">Image of a venue</string>
     <string name="navigate_button">tapping this area will direct you to a navigation app</string>
+    <string name="error_message">Unfortunately, the information you request could not be fetched.</string>
+    <string name="error_message_rate_limit">Unfortunately, this demo app does not pay for premium access. The data you
+        have accessed has been rate limited
+    </string>
+    <string name="try_again">Try Again</string>
+    <string name="navigate_to_detail_view">Tapping this area will navigate you to the venue detail page</string>
 </resources>

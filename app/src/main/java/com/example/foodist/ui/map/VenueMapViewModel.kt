@@ -56,17 +56,17 @@ class VenueMapViewModel @Inject constructor(
   }
 
 
-  private fun getVenues(latLng: LatLng, radius: Float) = viewModelScope.launch {
+  private fun getVenues(latLng: LatLng, zoom: Float) = viewModelScope.launch {
     _venueRequestStatus.value = Status.LOADING
 
-    val radius = MapMeasurements().getRadius(latLng as LatLng, radius.toDouble())
+    val radius = MapMeasurements().getRadius(latLng, zoom.toDouble())
     venueRepository.fetchVenues(latLng, radius).let { venueResult ->
       when (venueResult) {
         is ResultWrapper.NetworkError -> _venueRequestStatus.value = Status.ERROR_NETWORK
         is ResultWrapper.GenericError -> _venueRequestStatus.value = Status.ERROR
         is ResultWrapper.Success -> {
           val oldList = if (_venues.value?.isNotEmpty() == true) _venues.value else listOf<Venue>()
-          var finalResultSet = venueResult.value.toMutableList()
+          val finalResultSet = venueResult.value.toMutableList()
           if (oldList != null) {
             finalResultSet.addAll(oldList)
             finalResultSet.distinctBy { it.id }
@@ -81,9 +81,10 @@ class VenueMapViewModel @Inject constructor(
 
   private fun getCurrentLocation() {
     viewModelScope.launch {
-      locationService.fetchLocation().let {
-        _currentCenterPoint.value = it
+      locationService.fetchLocation().let { mapCenterPoint ->
+        _currentCenterPoint.value = mapCenterPoint
         _setMapArea.value = true
+        getVenues(mapCenterPoint, zoomValue)
       }
     }
   }

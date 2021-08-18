@@ -5,14 +5,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.INVISIBLE
-import android.view.View.VISIBLE
+import android.view.View.*
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
@@ -28,20 +27,19 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class VenueDetailFragment : Fragment() {
   private lateinit var detailView: View
-  private lateinit var viewModel: VenueDetailViewModel
   private val args: VenueDetailFragmentArgs by navArgs()
+  private val viewModel: VenueDetailViewModel by viewModels()
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
     savedInstanceState: Bundle?
-  ): View? {
+  ): View {
     detailView = inflater.inflate(R.layout.venue_detail_fragment, container, false)
     return detailView
   }
 
-  override fun onActivityCreated(savedInstanceState: Bundle?) {
-    viewModel = ViewModelProvider(this).get(VenueDetailViewModel::class.java)
-
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
     setEventHandler()
     initObservers()
     viewModel.onViewReady(args.venueId)
@@ -68,7 +66,7 @@ class VenueDetailFragment : Fragment() {
       when (status) {
         Status.LOADING -> toggleLoadingIndicator()
         Status.SUCCESS -> toggleLoadingIndicator()
-        Status.ERROR_NETWORK -> displayErrorIndicator()
+        else -> displayErrorIndicator()
       }
     }
   }
@@ -78,12 +76,12 @@ class VenueDetailFragment : Fragment() {
   }
 
   private fun updateVenueDetails(venueDetails: VenueDetails) {
-    venueDetails.rating.let {
+    if(venueDetails.rating != null) {
       detailView.findViewById<TextView>(R.id.rating).text = venueDetails.rating.toString()
     }
 
     venueDetails.bestPhoto?.let {
-      val url = "${venueDetails.bestPhoto.prefix}300x500${venueDetails.bestPhoto.suffix}"
+      val url = "${venueDetails.bestPhoto.prefix}original${venueDetails.bestPhoto.suffix}"
       val imageView = detailView.findViewById<ImageView>(R.id.venueImage)
       val transform = RoundedTransformationBuilder()
         .cornerRadiusDp(20f)
@@ -99,7 +97,7 @@ class VenueDetailFragment : Fragment() {
     }
 
     val locationContainer = detailView.findViewById<LinearLayout>(R.id.locationContainer)
-    if (venueDetails.location == null) {
+    if (venueDetails.location?.address == null) {
       locationContainer.visibility = INVISIBLE
     } else {
       detailView.findViewById<TextView>(R.id.venueAddressLine1).text = venueDetails.location.address
@@ -107,17 +105,13 @@ class VenueDetailFragment : Fragment() {
         "${venueDetails.location.city}, ${venueDetails.location.country}"
       locationContainer.visibility = VISIBLE
       locationContainer.setOnClickListener {
-        val gmmIntentUri = Uri.parse("geo:${venueDetails.location.lat},${venueDetails.location.lng}")
-        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+        val location = venueDetails.location
+        val uriString = "geo:<${location.lat}>,<${location.lng}>?q=${location.lat},${location.lng}"
+        val mapIntent = Intent(Intent.ACTION_VIEW, Uri.parse(uriString))
         startActivity(mapIntent)
       }
     }
-
-    venueDetails.location.let {
-
-    }
-    venueDetails.stats?.tipCount?.let {}
-
+    detailView.findViewById<LinearLayout>(R.id.infoContainer).visibility = VISIBLE
   }
 
   private fun toggleLoadingIndicator() {
@@ -127,5 +121,11 @@ class VenueDetailFragment : Fragment() {
 
   private fun displayErrorIndicator() {
     toggleLoadingIndicator()
+
+    detailView.findViewById<LinearLayout>(R.id.infoContainer).visibility = GONE
+
+    val errorContainer = detailView.findViewById<LinearLayout>(R.id.errorContainer)
+    errorContainer.findViewById<TextView>(R.id.errorMessage).text
+    errorContainer.visibility = VISIBLE
   }
 }

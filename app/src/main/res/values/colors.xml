@@ -6,6 +6,9 @@
     <color name="green_200">#7A8F70</color>
     <color name="green_500">#34432d</color>
     <color name="green_700">#23391A</color>
+    <color name="red_200">#D86D6D</color>
+    <color name="red_500">#A34141</color>
+    <color name="red_700">#7E2E2E</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="skeleton">#BFBFBF</color>

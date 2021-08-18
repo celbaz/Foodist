@@ -24,7 +24,7 @@ class MapMeasurements {
     val degreeOffset = radius * METER_IN_DEGREES
     return LatLngDimensions(
       centerPoint.latitude - degreeOffset,
-      centerPoint.latitude - degreeOffset,
+      centerPoint.latitude + degreeOffset,
       getUpdatedLongitude(centerPoint.latitude, centerPoint.longitude, -degreeOffset),
       getUpdatedLongitude(centerPoint.latitude, centerPoint.longitude, degreeOffset),
     )

@@ -36,3 +36,5 @@ places to eat nearby.
   a `@ScopedViewModel`. Due to the limited scope of the project, I have decided to initialize the PermissionService when
   calling the viewModels first lifecycle method. If this were a production application we'd have other workarounds 
   (using a ghost fragment, traversing the context tree, or keeping track of the current activity).
+* Given more time I would have added a remove markers out of bounds markers feature but, that would require geo-bucketing
+  (which is out of scope for the project) otherwise the cost of looking up what map markers are out of bounds is quite expense.
