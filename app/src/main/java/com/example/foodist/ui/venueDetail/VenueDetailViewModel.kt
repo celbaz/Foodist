@@ -25,7 +25,7 @@ class VenueDetailViewModel @Inject constructor(var venueRepository: VenueReposit
 
   fun onViewReady(id: String) {
     val venue = venueRepository.getVenueFromCache(id)
-    if (venue is Venue) {
+    if (venue != null) {
       _cachedInformation.value = venue
     }
 

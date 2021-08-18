@@ -12,7 +12,7 @@
     <fragment android:id="@+id/venueDetailFragment"
               android:name="com.example.foodist.ui.venueDetail.VenueDetailFragment"
               android:label="venue_detail_fragment" tools:layout="@layout/venue_detail_fragment">
-        <argument android:name="venueId" app:argType="string" />
+        <argument android:name="venueId" app:argType="string"/>
         <action android:id="@+id/action_venueDetailFragment_to_venueMapFragment"
                 app:destination="@id/venueMapFragment"/>
     </fragment>

@@ -133,6 +133,7 @@ class VenueMapFragment : Fragment() {
 
     viewModel.venues.observe(viewLifecycleOwner) { locations ->
       if (mapLoaded && locations.isNotEmpty()) {
+        // In a production application, I would clear the markers here.
         locations.forEach { location ->
           setMapPin(LatLng(location.location.lat, location.location.lng), location.id)
         }

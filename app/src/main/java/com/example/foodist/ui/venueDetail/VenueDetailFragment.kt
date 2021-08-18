@@ -76,7 +76,7 @@ class VenueDetailFragment : Fragment() {
   }
 
   private fun updateVenueDetails(venueDetails: VenueDetails) {
-    if(venueDetails.rating != null) {
+    if (venueDetails.rating != null) {
       detailView.findViewById<TextView>(R.id.rating).text = venueDetails.rating.toString()
     }
 

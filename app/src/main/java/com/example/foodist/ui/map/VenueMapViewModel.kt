@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.foodist.domain.models.Venue
 import com.example.foodist.domain.models.Venues
 import com.example.foodist.domain.repositories.VenueRepository
 import com.example.foodist.services.LocationService
@@ -55,34 +54,23 @@ class VenueMapViewModel @Inject constructor(
     }
   }
 
-
   private fun getVenues(latLng: LatLng, zoom: Float) = viewModelScope.launch {
     _venueRequestStatus.value = Status.LOADING
 
     val radius = MapMeasurements().getRadius(latLng, zoom.toDouble())
     val cachedVenues = venueRepository.fetchVenuesFromCache(latLng, radius)
-    _venues.value = mergeResultSets(_venues, cachedVenues)
+    _venues.value = cachedVenues
 
     venueRepository.fetchVenues(latLng, radius).let { venueResult ->
       when (venueResult) {
         is ResultWrapper.NetworkError -> _venueRequestStatus.value = Status.ERROR_NETWORK
         is ResultWrapper.GenericError -> _venueRequestStatus.value = Status.ERROR
         is ResultWrapper.Success -> {
-          _venues.value = mergeResultSets(_venues, venueResult.value)
+          _venues.value = venueResult.value
           _venueRequestStatus.value = Status.SUCCESS
         }
       }
     }
-  }
-
-  private fun mergeResultSets(oldList: LiveData<Venues>, newList: Venues ): Venues {
-    val previousList = if (oldList.value?.isNotEmpty() == true) oldList.value else listOf<Venue>()
-    val finalResultSet = newList.toMutableList()
-    if (previousList != null) {
-      finalResultSet.addAll(previousList)
-      finalResultSet.distinctBy { it.id }
-    }
-    return finalResultSet
   }
 
   private fun getCurrentLocation() {
