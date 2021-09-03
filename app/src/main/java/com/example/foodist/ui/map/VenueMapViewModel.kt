@@ -9,6 +9,7 @@ import com.example.foodist.domain.repositories.VenueRepository
 import com.example.foodist.services.LocationService
 import com.example.foodist.services.PermissionsRequest
 import com.example.foodist.services.PermissionsService
+import com.example.foodist.utils.Constants.Companion.DEFAULT_ZOOM_LEVEL
 import com.example.foodist.utils.MapMeasurements
 import com.example.foodist.utils.ResultWrapper
 import com.example.foodist.utils.Status
@@ -22,6 +23,7 @@ import javax.inject.Inject
 class VenueMapViewModel @Inject constructor(
   var venueRepository: VenueRepository,
   var locationService: LocationService,
+  var mapMeasurements: MapMeasurements,
 ) : ViewModel() {
   private val _venues = MutableLiveData<Venues>(mutableListOf())
   private val _venueRequestStatus = MutableLiveData<Status>()
@@ -57,7 +59,7 @@ class VenueMapViewModel @Inject constructor(
   private fun getVenues(latLng: LatLng, zoom: Float) = viewModelScope.launch {
     _venueRequestStatus.value = Status.LOADING
 
-    val radius = MapMeasurements().getRadius(latLng, zoom.toDouble())
+    val radius = mapMeasurements.getRadius(latLng, zoom.toDouble())
     val cachedVenues = venueRepository.fetchVenuesFromCache(latLng, radius)
     _venues.value = cachedVenues
 
@@ -85,9 +87,5 @@ class VenueMapViewModel @Inject constructor(
 
   private fun setCurrentLocation(latLng: LatLng) {
     locationService.setLocation(latLng)
-  }
-
-  companion object {
-    const val DEFAULT_ZOOM_LEVEL = 15.0f
   }
 }

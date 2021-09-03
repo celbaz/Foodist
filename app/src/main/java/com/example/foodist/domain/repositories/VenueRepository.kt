@@ -12,10 +12,11 @@ import javax.inject.Inject
 
 class VenueRepository @Inject constructor(
   private val apiService: FoursquareApiService,
-  private val cache: LruCache<String, Venue>
+  private val cache: LruCache<String, Venue>,
+  private val internetConnectivity: InternetConnectivity
 ) {
   suspend fun fetchVenues(coordinates: LatLng, radius: Double): ResultWrapper<Venues> {
-    if (!isOnline()) {
+    if (!internetConnectivity.isOnline()) {
       val cachedResults = fetchVenuesFromCache(coordinates, radius)
       return ResultWrapper.Success(cachedResults)
     }

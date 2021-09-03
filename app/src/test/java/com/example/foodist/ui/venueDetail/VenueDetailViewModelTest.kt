@@ -24,7 +24,6 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 @ExperimentalCoroutinesApi
 class VenueDetailViewModelTest {
-
   @InjectMocks
   private lateinit var viewModel: VenueDetailViewModel
 
@@ -46,12 +45,13 @@ class VenueDetailViewModelTest {
   @get:Rule
   var rule: TestRule = InstantTaskExecutorRule()
 
-
   @Test
   fun onViewReady_missingCachedValue() {
     Mockito.`when`(mockRepository.getVenueFromCache("")).thenReturn(null)
+
     viewModel = VenueDetailViewModel(mockRepository)
     viewModel.onViewReady("")
+
     Assert.assertEquals(null, viewModel.cachedInformation.value)
   }
 
@@ -60,8 +60,10 @@ class VenueDetailViewModelTest {
     val location = Location("Nowhere", 0.0, 0.0, "", "", "", "", listOf())
     val venue = Venue("123", "restaurant", location)
     Mockito.`when`(mockRepository.getVenueFromCache("123")).thenReturn(venue)
+
     viewModel = VenueDetailViewModel(mockRepository)
     viewModel.onViewReady("123")
+
     Assert.assertEquals(venue, viewModel.cachedInformation.value)
   }
 
@@ -83,6 +85,7 @@ class VenueDetailViewModelTest {
 
     viewModel = VenueDetailViewModel(mockRepository)
     viewModel.onViewReady("123")
+
     Assert.assertEquals(venueDetails, viewModel.venueDetails.value)
     Assert.assertEquals(Status.SUCCESS, viewModel.requestStatus.value)
   }
@@ -91,10 +94,11 @@ class VenueDetailViewModelTest {
   fun onViewReady_fetchedErrorGeneric() {
     runBlocking {
       Mockito.`when`(mockRepository.getVenueDetails("123")).thenReturn(ResultWrapper.GenericError())
-
     }
+
     viewModel = VenueDetailViewModel(mockRepository)
     viewModel.onViewReady("123")
+
     Assert.assertEquals(null, viewModel.venueDetails.value)
     Assert.assertEquals(Status.ERROR, viewModel.requestStatus.value)
   }
@@ -103,13 +107,12 @@ class VenueDetailViewModelTest {
   fun onViewReady_fetchedErrorNetwork() {
     runBlocking {
       Mockito.`when`(mockRepository.getVenueDetails("123")).thenReturn(ResultWrapper.NetworkError)
-
     }
 
     viewModel = VenueDetailViewModel(mockRepository)
     viewModel.onViewReady("123")
+
     Assert.assertEquals(null, viewModel.venueDetails.value)
     Assert.assertEquals(Status.ERROR_NETWORK, viewModel.requestStatus.value)
   }
-
 }

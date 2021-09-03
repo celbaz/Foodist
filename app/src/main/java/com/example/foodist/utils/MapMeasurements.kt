@@ -2,6 +2,7 @@ package com.example.foodist.utils
 
 import android.content.res.Resources
 import com.google.android.gms.maps.model.LatLng
+import javax.inject.Inject
 import kotlin.math.cos
 import kotlin.math.pow
 
@@ -12,7 +13,7 @@ data class LatLngDimensions(
   val endPointLng: Double,
 )
 
-class MapMeasurements {
+class MapMeasurements @Inject constructor() {
 
   fun getRadius(latLng: LatLng, zoom: Double): Double {
     val width = getScreenWidth().toDouble()

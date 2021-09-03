@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment
 import com.example.foodist.R
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
+typealias OnCompleteCallback = (success: Boolean) -> Unit
+
 /**
  * The **PermissionsService** is called in order to attempt to ascertain permissions
  * required by a feature.
@@ -17,10 +19,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
  *    - permission: PermissionRequest
  *    - onComplete: (success: Boolean) -> Void
  */
-
-typealias OnCompleteCallback = (success: Boolean) -> Unit
-
-class PermissionsService constructor(private val fragment: Fragment) {
+class PermissionsService(private val fragment: Fragment) {
   private var onPermissionRequestComplete: OnCompleteCallback? = null
   private val registerForActivity = fragment.registerForActivityResult(
     ActivityResultContracts.RequestMultiplePermissions()
@@ -30,7 +29,7 @@ class PermissionsService constructor(private val fragment: Fragment) {
     onPermissionRequestComplete = null
   }
 
-  fun checkGrantedPermissions(permission: PermissionsRequest, onComplete: (success: Boolean) -> Unit) {
+  fun checkGrantedPermissions(permission: PermissionsRequest, onComplete: OnCompleteCallback) {
     if (arePermissionsGranted(permission)) {
       onComplete(true)
     } else {

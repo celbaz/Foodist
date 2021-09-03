@@ -13,7 +13,6 @@ import com.example.foodist.utils.Constants.Companion.LAST_LOCATION_SHARED_PREFER
 import com.example.foodist.utils.CountryList
 import com.example.foodist.utils.ResultWrapper
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.tasks.await
@@ -27,15 +26,10 @@ import javax.inject.Inject
  *   -  If all else fails fetch the center of the users country via device locale and list of centroid points as starting point
  */
 class LocationService @Inject constructor(
-  val geoLocation: GeolocationRepository,
-  @ApplicationContext val context: Context
+  private val geoLocation: GeolocationRepository,
+  private val fusedLocationProviderClient: FusedLocationProviderClient,
+  @ApplicationContext val context: Context,
 ) {
-  private var fusedLocationProviderClient: FusedLocationProviderClient =
-    LocationServices.getFusedLocationProviderClient(context)
-
-  private val _currentLocation = MutableLiveData<LatLng>()
-  val currentLocation: LiveData<LatLng> = _currentLocation
-
   fun setLocation(latLng: LatLng) {
     val sharedPreferences = context.getSharedPreferences(
       LAST_LOCATION_SHARED_PREFERENCE_KEY,
@@ -57,9 +51,7 @@ class LocationService @Inject constructor(
         Manifest.permission.ACCESS_FINE_LOCATION
       ) == PackageManager.PERMISSION_GRANTED
     ) {
-      fusedLocationProviderClient.lastLocation.continueWithTask {
-        it
-      }.await().let { result ->
+      fusedLocationProviderClient.lastLocation.await().let { result ->
         if (result != null) {
           return LatLng(result.latitude, result.longitude)
         }
@@ -72,7 +64,7 @@ class LocationService @Inject constructor(
       }
     }
 
-    return fetchLocationFromSharedPreferences() ?: (fetchLocationFromUserLocale() ?: FALLBACK_LAT_LNG)
+    return fetchLocationFromSharedPreferences() ?: fetchLocationFromUserLocale() ?: FALLBACK_LAT_LNG
   }
 
   private fun fetchLocationFromSharedPreferences(): LatLng? {

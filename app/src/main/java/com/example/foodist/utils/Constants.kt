@@ -7,5 +7,6 @@ class Constants {
     const val FOURSQUARE_FOOD_CATEGORY_ID = "4d4b7105d754a06374d81259"
     const val GOOGLE_MAPS_BASE_URL = "https://www.googleapis.com/geolocation/v1/"
     const val LAST_LOCATION_SHARED_PREFERENCE_KEY = "lastLocationPreference"
+    const val DEFAULT_ZOOM_LEVEL = 15.0f
   }
 }
