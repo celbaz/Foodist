@@ -85,7 +85,7 @@ class VenueMapViewModelTest {
       .thenAnswer(Answer { invocation -> invocation.getArgument<OnCompleteCallback>(1)(true) })
 
     runBlocking {
-      Mockito.`when`(mockLocationService.fetchLocation()).thenReturn(location)
+      Mockito.`when`(mockLocationService.fetchLastKnownLocation()).thenReturn(location)
       Mockito.`when`(mockMapMeasurements.getRadius(location, DEFAULT_ZOOM_LEVEL.toDouble())).thenReturn(radius)
       Mockito.`when`(mockVenueRepository.fetchVenuesFromCache(location, radius)).thenReturn(cachedResponse)
       Mockito.`when`(mockVenueRepository.fetchVenues(location, radius)).thenReturn(ResultWrapper.Success(rpcResponse))

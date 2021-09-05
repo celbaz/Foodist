@@ -24,7 +24,7 @@ import org.robolectric.shadows.ShadowApplication
 
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [29])
+@Config(sdk = [21])
 class PermissionsServiceTest {
 
   @get:Rule

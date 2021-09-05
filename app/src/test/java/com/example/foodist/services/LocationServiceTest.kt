@@ -25,7 +25,7 @@ import org.robolectric.shadows.ShadowApplication
 
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [29])
+@Config(sdk = [21])
 class LocationServiceTest {
 
   @get:Rule
@@ -53,7 +53,7 @@ class LocationServiceTest {
   }
 
   @Test
-  fun fetchLocation_successFetchedFromLocationProvider() {
+  fun fetchLastKnownLocation_successFetchedFromLocationProvider() {
     val location = Location(LocationManager.GPS_PROVIDER)
     location.latitude = 30.0
     location.longitude = 40.0
@@ -66,44 +66,44 @@ class LocationServiceTest {
     shadowApp.grantPermissions(Manifest.permission.ACCESS_FINE_LOCATION)
 
     runBlocking {
-      val result = service.fetchLocation()
+      val result = service.fetchLastKnownLocation()
 
       Assert.assertEquals(LatLng(location.latitude, location.longitude), result)
     }
   }
 
   @Test
-  fun fetchLocation_successFetchedFromGeolocationRepository() {
+  fun fetchLastKnownLocation_successFetchedFromGeolocationRepository() {
     val latLng = LatLng(11.11, 22.22)
 
     runBlocking {
       `when`(geolocationRepository.fetchLocation()).thenReturn(ResultWrapper.Success(latLng))
       shadowApp.denyPermissions(Manifest.permission.ACCESS_FINE_LOCATION)
 
-      Assert.assertEquals(latLng, service.fetchLocation())
+      Assert.assertEquals(latLng, service.fetchLastKnownLocation())
     }
   }
 
   @Test
-  fun fetchLocation_successFetchedFromSharedPreferences() {
+  fun fetchLastKnownLocation_successFetchedFromSharedPreferences() {
     val latLng = LatLng(11.21, 22.22)
 
     runBlocking {
       service.setLocation(latLng)
       shadowApp.denyPermissions(Manifest.permission.ACCESS_FINE_LOCATION)
 
-      Assert.assertEquals(latLng, service.fetchLocation())
+      Assert.assertEquals(latLng, service.fetchLastKnownLocation())
     }
   }
 
   @Test
   @Config(qualifiers = "fr-rFR")
-  fun fetchLocation_successFetchedFromUserLocale() {
+  fun fetchLastKnownLocation_successFetchedFromUserLocale() {
     val country = CountryList["FR"]!!
     val centroid = LatLng(country.latitude, country.longitude)
 
     runBlocking {
-      val result = service.fetchLocation()
+      val result = service.fetchLastKnownLocation()
 
       Assert.assertEquals(centroid, result)
     }

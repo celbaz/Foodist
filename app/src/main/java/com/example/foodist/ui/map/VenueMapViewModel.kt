@@ -77,7 +77,7 @@ class VenueMapViewModel @Inject constructor(
 
   private fun getCurrentLocation() {
     viewModelScope.launch {
-      locationService.fetchLocation().let { mapCenterPoint ->
+      locationService.fetchLastKnownLocation().let { mapCenterPoint ->
         _currentCenterPoint.value = mapCenterPoint
         _setMapArea.value = true
         getVenues(mapCenterPoint, zoomValue)

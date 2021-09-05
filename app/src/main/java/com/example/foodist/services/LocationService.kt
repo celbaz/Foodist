@@ -6,8 +6,6 @@ import android.content.pm.PackageManager
 import android.content.res.Resources
 import androidx.core.app.ActivityCompat
 import androidx.core.os.ConfigurationCompat
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.example.foodist.domain.repositories.GeolocationRepository
 import com.example.foodist.utils.Constants.Companion.LAST_LOCATION_SHARED_PREFERENCE_KEY
 import com.example.foodist.utils.CountryList
@@ -20,9 +18,9 @@ import javax.inject.Inject
 
 /**
  * Operating Logic when fetching current location:
+ *   -  If there is a stored last location, fetch the last viewed location
  *   -  If the user has given location permissions, then fetch via locationProvider
  *   -  If the user has not given location permissions, then fetch via geolocationRepository
- *   -  If there is a network connection issue fetch the lastViewed location
  *   -  If all else fails fetch the center of the users country via device locale and list of centroid points as starting point
  */
 class LocationService @Inject constructor(
@@ -45,7 +43,13 @@ class LocationService @Inject constructor(
     }
   }
 
-  suspend fun fetchLocation(): LatLng {
+  suspend fun fetchLastKnownLocation(): LatLng {
+    fetchLocationFromSharedPreferences()?.let { return it }
+
+    return fetchLocation()
+  }
+
+  private suspend fun fetchLocation(): LatLng {
     if (ActivityCompat.checkSelfPermission(
         context,
         Manifest.permission.ACCESS_FINE_LOCATION
@@ -64,7 +68,7 @@ class LocationService @Inject constructor(
       }
     }
 
-    return fetchLocationFromSharedPreferences() ?: fetchLocationFromUserLocale() ?: FALLBACK_LAT_LNG
+    return fetchLocationFromUserLocale() ?: FALLBACK_LAT_LNG
   }
 
   private fun fetchLocationFromSharedPreferences(): LatLng? {
